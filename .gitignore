@@ -1,0 +1,21 @@
+
+# Virtual Environment
+ab_testing_env/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Data and logs
+data/*.csv
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Figures
+data/figures/*.pngycache__/
+*.pyc
