@@ -38,3 +38,7 @@ class UCB1Bandit:
 
     def add_view(self):
         self.views += 1
+
+    @staticmethod
+    def is_exploring(bound_a, bound_b, n_total, min_views):
+        return abs(bound_a - bound_b) < np.sqrt(2 * np.log(n_total) / min_views)
