@@ -15,7 +15,7 @@ banditB = UCB1Bandit("B") # --
 
 # Initialize the visualization tool
 visualizer = BanditVisualizer()
-snapshot_points = [40, 100, 300, 700, 1300, 2000]
+snapshot_points = [40, 100, 300, 700, 1500, 2500]
 
 # Compare samples and select button to sho
 @app.route("/show")

@@ -69,7 +69,7 @@ class BanditVisualizer:
         plt.savefig(Path(save_path) / f'ucb_bounds_{iteration}.png')
         plt.close()   
 
-   def create_grid(self, save_path, iterations=[40, 100, 300, 700, 1500, 2500]):
+   def create_grid(self, save_path, iterations=[40, 100, 400, 700, 1500, 2500]):
        
        """Combine saved snapshots into a 2x3 grid."""
        fig, axes = plt.subplots(2, 3, figsize=(20, 12))
@@ -135,11 +135,11 @@ def plot_cumulative_reward(true_ctrs, decisions, n_samples, save_path):
     win_rates = cumulative_rewards / (np.arange(n_samples) + 1)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(win_rates, color="#2cd0e6")
-    plt.plot(np.ones(n_samples)*np.max(true_ctrs), color="#e62c95")
+    plt.plot(win_rates, color="#2cd0e6", label="Cumulative Reward")
+    plt.plot(np.ones(n_samples)*np.max(true_ctrs), color="#e62c95", label="Optimal rate")
     
     plt.xlabel('Number of Trials')
-    plt.ylabel('Cumulative Reward')
+    plt.ylabel('Reward')
     plt.title('Learning Progress: Cumulative Reward Over Time')
     plt.legend()
     plt.grid(True, alpha=0.3)

@@ -1,5 +1,6 @@
 import logging
 from flask import Flask, jsonify, request
+import numpy as np
 import pandas as pd
 from models.bandits import ThompsonBandit
 from models.visualizations import BanditVisualizer, plot_cumulative_reward
@@ -12,30 +13,27 @@ actual_ctr_a = original_df.loc[original_df["button"]=="A"]["action"].mean()
 actual_ctr_b = original_df.loc[original_df["button"]=="B"]["action"].mean()
 
 # Initialize bandit instances
-banditA = ThompsonBandit("A") 
-banditB = ThompsonBandit("B") 
+banditA = ThompsonBandit("A", a_prior=1, b_prior=1, minimum_exploration=True) 
+banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=True) 
 
 # Initialize the visualization tool
 visualizer = BanditVisualizer()
-snapshot_points = [40, 100, 300, 700, 1500, 2500]
+snapshot_points = [40, 100, 400, 700, 1500, 2500]
 decisions = []
 
-explorations = 0
-exploitations = 0
 # Compare samples and select button to sho
 @app.route("/show")
 def show():
-  global explorations, exploitations
   n_views = banditA.views + banditB.views
+  minimum_explore = banditA.minimum_exploration and banditB.minimum_exploration
   decisions.append(0)
-  
-  sample_a = banditA.sample()
-  sample_b = banditB.sample()
 
-  if ThompsonBandit.is_exploring(sample_a, sample_b):
-    explorations += 1
+  if minimum_explore and n_views < 400:
+    sample_a = np.random.random()
+    sample_b = np.random.random()
   else:
-    exploitations += 1
+    sample_a = banditA.sample()
+    sample_b = banditB.sample()
 
   if sample_a > sample_b: 
     button = "A"
@@ -77,7 +75,7 @@ if __name__ == "__main__":
     }
     
   n_samples = banditA.views + banditB.views
-  results = analyze_and_save_results(banditA, banditB, explorations, exploitations, original_df)
+  results = analyze_and_save_results(banditA, banditB, original_df)
   plot_cumulative_reward(true_ctrs=[actual_ctr_a, actual_ctr_b], decisions=decisions, 
                          n_samples=n_samples, save_path="data/figures")
 
