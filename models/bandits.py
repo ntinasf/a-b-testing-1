@@ -45,3 +45,16 @@ class UCB1Bandit:
     @staticmethod
     def is_exploring(bound_a, bound_b, n_total, min_views):
         return abs(bound_a - bound_b) < np.sqrt(2 * np.log(n_total) / min_views)
+    
+
+class ClassicABTest:
+    def __init__(self, name):
+        self.clicks = 0
+        self.views = 0
+        self.name = name
+        
+    def add_click(self):
+        self.clicks += 1
+        
+    def add_view(self):
+        self.views += 1

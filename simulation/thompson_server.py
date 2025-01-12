@@ -13,12 +13,13 @@ actual_ctr_a = original_df.loc[original_df["button"]=="A"]["action"].mean()
 actual_ctr_b = original_df.loc[original_df["button"]=="B"]["action"].mean()
 
 # Initialize bandit instances
-banditA = ThompsonBandit("A", a_prior=1, b_prior=1, minimum_exploration=True) 
-banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=True) 
+method= "TS_priors"  #"TS_min_exp" # or "TS_priors"
+banditA = ThompsonBandit("A", a_prior=6, b_prior=78, minimum_exploration=False) # 6 78 False
+banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=False) # False
 
 # Initialize the visualization tool
 visualizer = BanditVisualizer()
-snapshot_points = [40, 100, 400, 700, 1500, 2500]
+snapshot_points = [50, 150, 400, 700, 1300, 2000]
 decisions = []
 
 # Compare samples and select button to sho
@@ -28,7 +29,7 @@ def show():
   minimum_explore = banditA.minimum_exploration and banditB.minimum_exploration
   decisions.append(0)
 
-  if minimum_explore and n_views < 400:
+  if minimum_explore and n_views < 500:
     sample_a = np.random.random()
     sample_b = np.random.random()
   else:
@@ -45,7 +46,7 @@ def show():
     logging.info(f"Showing button B - Views: {banditB.views}")
 
   if n_views in snapshot_points:
-    visualizer.plot_posterior(banditA, banditB, n_views, 'data/figures')
+    visualizer.plot_posterior(banditA, banditB, n_views, method ,'data/figures')
     
   return jsonify({"button": button})
 
@@ -61,6 +62,7 @@ def click_button():
     logging.info(f"Button B clicked - Clicks: {banditB.clicks}")
   else:
     result = "Invalid Input."
+
   decisions[banditA.views + banditB.views - 1] = 1
 
   return jsonify({"result": result})
@@ -68,16 +70,12 @@ def click_button():
 
 if __name__ == "__main__":
   app.run(host="127.0.0.1", port="8888")
-  visualizer.create_grid('data/figures')
-  results = {
-        'A': {'clicks': banditA.clicks, 'views': banditA.views},
-        'B': {'clicks': banditB.clicks, 'views': banditB.views}
-    }
-    
-  n_samples = banditA.views + banditB.views
-  results = analyze_and_save_results(banditA, banditB, original_df)
-  plot_cumulative_reward(true_ctrs=[actual_ctr_a, actual_ctr_b], decisions=decisions, 
-                         n_samples=n_samples, save_path="data/figures")
+  visualizer.create_grid(method=method, save_path='data/figures')
+  
+  pd.Series(decisions).to_csv(f'data/{method}_decisions.csv', index=False) 
+  
+  results = analyze_and_save_results(banditA, banditB, original_df, method)
+  pd.DataFrame(results).to_csv(f'data/{method}_results.csv', index=False)
 
-  print(f"\n A : Clicks-{banditA.clicks}, Views-{banditA.views}, CTR-{banditA.clicks / banditA.views}")
-  print(f"\n B : Clicks-{banditB.clicks}, Views-{banditB.views}, CTR-{banditB.clicks / banditB.views}")
+  print(f"\n A : Clicks-{banditA.clicks}, Views-{banditA.views}, CTR-{banditA.clicks / banditA.views:.3f}")
+  print(f"\n B : Clicks-{banditB.clicks}, Views-{banditB.views}, CTR-{banditB.clicks / banditB.views:.3f}")

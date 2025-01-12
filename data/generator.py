@@ -7,9 +7,9 @@ using the Bernoulli distribution to simulate user behavior.
 import numpy as np
 import pandas as pd
 
-np.random.seed(6) # For reproducibility
+np.random.seed(42) # For reproducibility
 
-N_SAMPLES = 5000 # Total number of views for both buttons
+N_SAMPLES = 15000 # Total number of views for both buttons
 CTR_A = 0.07 # True CTR for button A (7%)
 CTR_B = 0.10 # True CTR for button B (10%)
 
@@ -25,7 +25,7 @@ df = pd.DataFrame(
 )
 
 # Shuffle the data
-df = df.sample(frac=1, random_state=6).reset_index(drop=True)
+df = df.sample(frac=1).reset_index(drop=True)
 
 # Save to CSV
 df.to_csv("click_data.csv")

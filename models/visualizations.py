@@ -6,26 +6,24 @@ import numpy as np
 from pathlib import Path
 
 class BanditVisualizer:
-   def plot_posterior(self, banditA, banditB, iteration, save_path):
+   def plot_posterior(self, banditA, banditB, iteration, method, save_path):
        
        """Create and save posterior distribution plot for both bandits."""
-       # Generate x values for Beta distribution
-       x = np.linspace(0, 1, 1000)
-       
+      
        # Calculate Beta distributions
-       a_dist = [np.random.beta(1 + banditA.clicks, 1 + banditA.views - banditA.clicks) 
-                for _ in range(10000)]
-       b_dist = [np.random.beta(1 + banditB.clicks, 1 + banditB.views - banditB.clicks) 
-                for _ in range(10000)]
+       a_dist = [np.random.beta(banditA.a_prior + banditA.clicks, banditA.b_prior + banditA.views - banditA.clicks) 
+                for _ in range(5000)]
+       b_dist = [np.random.beta(banditB.a_prior + banditB.clicks, banditB.b_prior + banditB.views - banditB.clicks) 
+                for _ in range(5000)]
 
        # Create plot
        plt.figure(figsize=(10, 6))
-       sns.kdeplot(data=a_dist, label=f'Button A (CTR: {banditA.clicks/banditA.views:.3f})', 
-                   color='#a2e62c')
-       sns.kdeplot(data=b_dist, label=f'Button B (CTR: {banditB.clicks/banditB.views:.3f})', 
-                   color='#e66d2c')
+       sns.kdeplot(data=a_dist, label=f'Button A (CTR: {(banditA.a_prior + banditA.clicks - 1) / (banditA.b_prior + banditA.views - 1):.3f})', 
+                   color='#f04b26', linewidth=2)
+       sns.kdeplot(data=b_dist, label=f'Button B (CTR: {(banditB.a_prior + banditB.clicks - 1) / (banditB.b_prior + banditB.views - 1):.3f})', 
+                   color='#5a18de', linewidth=2)
        
-       plt.title(f'Posterior Distributions after {iteration} iterations')
+       plt.title(f'{method} Posterior Distributions after {iteration} iterations')
        plt.xlabel('Click-through Rate (CTR)')
        plt.ylabel('Density')
        plt.legend()
@@ -69,10 +67,10 @@ class BanditVisualizer:
         plt.savefig(Path(save_path) / f'ucb_bounds_{iteration}.png')
         plt.close()   
 
-   def create_grid(self, save_path, iterations=[40, 100, 400, 700, 1500, 2500]):
+   def create_grid(self, save_path, iterations=[50, 150, 400, 700, 1300, 2000], method):
        
        """Combine saved snapshots into a 2x3 grid."""
-       fig, axes = plt.subplots(2, 3, figsize=(20, 12))
+       _, axes = plt.subplots(2, 3, figsize=(20, 12))
        
        for idx, iteration in enumerate(iterations):
            img = plt.imread(Path(save_path) / f'posterior_{iteration}.png') # -
@@ -83,7 +81,7 @@ class BanditVisualizer:
            ax.set_title(f'After {iteration} iterations')
        
        plt.tight_layout()
-       plt.savefig(Path(save_path) / 'posterior_grid.png') # -
+       plt.savefig(Path(save_path) / f'{method} posterior_grid.png') # -
        #plt.savefig(Path(save_path) / 'UCB1_grid.png') # --
        plt.close()
 
@@ -128,18 +126,23 @@ class BanditVisualizer:
     plt.close()
 
 
-def plot_cumulative_reward(true_ctrs, decisions, n_samples, save_path):
+def plot_cumulative_reward(true_ctrs, decisions, alg_names, n_samples, save_path):
     """Plot cumulative rewards over time."""
 
-    cumulative_rewards = np.cumsum(decisions)
-    win_rates = cumulative_rewards / (np.arange(n_samples) + 1)
+    rewards = []
+    win_rates = []
+    for i, array in enumerate(decisions):
+        rewards[i] = np.cumsum(decisions)
+        win_rates[i] = rewards / (np.arange(len(array)) + 1)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(win_rates, color="#2cd0e6", label="Cumulative Reward")
+    for i in len(win_rates):
+        plt.plot(win_rates[i], label=alg_names[i])
     plt.plot(np.ones(n_samples)*np.max(true_ctrs), color="#e62c95", label="Optimal rate")
+    plt.axvline(x=500, color='black', linestyle=':', linewidth=0.5) # used for thmompson server
     
     plt.xlabel('Number of Trials')
-    plt.ylabel('Reward')
+    plt.ylabel('Cumulative Reward')
     plt.title('Learning Progress: Cumulative Reward Over Time')
     plt.legend()
     plt.grid(True, alpha=0.3)
@@ -147,5 +150,6 @@ def plot_cumulative_reward(true_ctrs, decisions, n_samples, save_path):
     # Add log scale option
     plt.xscale('log')
     
+
     plt.savefig(Path(save_path) / 'cumulative_reward.png')
     plt.close()
