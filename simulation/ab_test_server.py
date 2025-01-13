@@ -8,13 +8,13 @@ from analysis.performance import analyze_and_save_results
 
 app = Flask(__name__)
 
-method = "ab_test"
 original_df = pd.read_csv("data/click_data.csv")
-decisions = []
 
-# Initialize variants
+method = "ab_test"
 variantA = ClassicABTest("A")
 variantB = ClassicABTest("B")
+
+decisions = []
 current_assignment = "A"  # Start with A
 
 @app.route("/show")
@@ -44,6 +44,7 @@ def click_button():
         result = "Invalid Input."
 
     decisions[variantA.views + variantB.views - 1] = 1 
+    
     return jsonify({"result": result})
 
 if __name__ == "__main__":

@@ -3,33 +3,32 @@ from flask import Flask, jsonify, request
 import numpy as np
 import pandas as pd
 from models.bandits import ThompsonBandit
-from models.visualizations import BanditVisualizer, plot_cumulative_reward
+from models.visualizations import BanditVisualizer
 from analysis.performance import analyze_and_save_results
 
 app = Flask(__name__)
 
 original_df = pd.read_csv("data/click_data.csv")
-actual_ctr_a = original_df.loc[original_df["button"]=="A"]["action"].mean()
-actual_ctr_b = original_df.loc[original_df["button"]=="B"]["action"].mean()
 
 # Initialize bandit instances
-method= "TS_priors"  #"TS_min_exp" # or "TS_priors"
-banditA = ThompsonBandit("A", a_prior=6, b_prior=78, minimum_exploration=False) # 6 78 False
-banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=False) # False
+method= "TS_min_exp"  #"TS_min_exp" # or "TS_priors"
+banditA = ThompsonBandit("A", a_prior=1, b_prior=1, minimum_exploration=True) # 6 78 False
+banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=True) # False
 
 # Initialize the visualization tool
 visualizer = BanditVisualizer()
-snapshot_points = [50, 150, 400, 700, 1300, 2000]
+snapshot_points = [50, 150, 500, 1500, 3000, 5000]
 decisions = []
 
 # Compare samples and select button to sho
 @app.route("/show")
 def show():
+
+  decisions.append(0)
   n_views = banditA.views + banditB.views
   minimum_explore = banditA.minimum_exploration and banditB.minimum_exploration
-  decisions.append(0)
-
-  if minimum_explore and n_views < 500:
+  
+  if minimum_explore and n_views < 600:
     sample_a = np.random.random()
     sample_b = np.random.random()
   else:
@@ -46,7 +45,7 @@ def show():
     logging.info(f"Showing button B - Views: {banditB.views}")
 
   if n_views in snapshot_points:
-    visualizer.plot_posterior(banditA, banditB, n_views, method ,'data/figures')
+    visualizer.plot_posterior(banditA, banditB, n_views, method)
     
   return jsonify({"button": button})
 
@@ -70,6 +69,7 @@ def click_button():
 
 if __name__ == "__main__":
   app.run(host="127.0.0.1", port="8888")
+
   visualizer.create_grid(method=method, save_path='data/figures')
   
   pd.Series(decisions).to_csv(f'data/{method}_decisions.csv', index=False) 
