@@ -70,11 +70,11 @@ def plot_cumulative_reward(true_ctrs, decisions, alg_names, save_path):
         plt.plot(win_rates[i], label=alg_names[i])
     plt.plot(np.ones(max_length)*np.max(true_ctrs), color="#e62c95", label="Optimal rate")
     plt.axvline(x=600, color='black', linestyle=':', linewidth=0.5) # used for thmompson server
-    plt.ylim(0, 0.12)
+    plt.ylim(0, 0.14)
     plt.xlabel('Number of Trials')
     plt.ylabel('Cumulative Reward')
     plt.title('Learning Progress: Cumulative Reward Over Time')
-    plt.legend()
+    plt.legend(loc='lower right')
     plt.grid(True, alpha=0.3)
     
     # Add log scale option

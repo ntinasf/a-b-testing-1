@@ -19,3 +19,9 @@ data/*.csv
 # Figures
 data/figures/*.pngycache__/
 *.pyc
+
+# Python package
+*.egg-info/
+*.egg
+dist/
+build/

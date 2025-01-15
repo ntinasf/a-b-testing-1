@@ -89,3 +89,19 @@ python client.py  # Set count<=5000
 ```
 
 **Note**: Use `Ctrl+C` to stop servers after client completion.
+
+
+## Results
+For detailed analysis and conclusions, see[`notebooks/analysis.ipynb`](notebooks/analysis.ipynb). Key findings:
+
+- Classic A/B testing confirmed Button B's superiority with 95% confidence, requiring ~4,700 samples per variant
+- Thompson Sampling implementations both identified the better variant while providing:
+  - 15-20% higher cumulative rewards compared to A/B testing
+  - More efficient button allocation
+
+- Implementation Comparison:
+  - TS with minimum exploration: More thorough exploration, higher confidence (2 weeks)
+  - TS with informed priors: Faster decision-making, comparable results (1 week)
+  - Both approaches achieved >95% probability of Button B being superior
+
+- Practical Impact: Adaptive methods demonstrated clear advantages in both testing efficiency and user engagement optimization
