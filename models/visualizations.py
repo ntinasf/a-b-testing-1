@@ -16,7 +16,6 @@ class BanditVisualizer:
        b_dist = [np.random.beta(banditB.a_prior + banditB.clicks, banditB.b_prior + banditB.views - banditB.clicks) 
                 for _ in range(5000)]
 
-       # Create plot
        plt.figure(figsize=(10, 6))
 
        sns.kdeplot(data=a_dist, label=f'Button A (CTR: {(banditA.a_prior + banditA.clicks - 1) / (banditA.b_prior + banditA.views - 1):.3f})', 
@@ -28,8 +27,6 @@ class BanditVisualizer:
        plt.xlabel('Click-through Rate (CTR)')
        plt.ylabel('Density')
        plt.legend()
-       
-       # Save plot
        plt.savefig(f'data/figures/posterior_{iteration}.png')
        plt.close()
 
@@ -37,23 +34,23 @@ class BanditVisualizer:
    def create_grid(self, method, save_path, iterations=[50, 150, 500, 1500, 3000, 5000]):
        
        """Combine saved snapshots into a 2x3 grid."""
+
        _, axes = plt.subplots(2, 3, figsize=(20, 12))
        
        for idx, iteration in enumerate(iterations):
-           img = plt.imread(Path(save_path) / f'posterior_{iteration}.png') # -
-           #img = plt.imread(Path(save_path) / f'ucb_evolution_{iteration}.png') # --
+           img = plt.imread(Path(save_path) / f'posterior_{iteration}.png')
            ax = axes[idx//3, idx%3]
            ax.imshow(img)
            ax.axis('off')
            ax.set_title(f'After {iteration} iterations')
        
        plt.tight_layout()
-       plt.savefig(Path(save_path) / f'{method}_posterior_grid.png') # -
-       #plt.savefig(Path(save_path) / 'UCB1_grid.png') # --
+       plt.savefig(Path(save_path) / f'{method}_posterior_grid.png')
        plt.close()
 
    
 def plot_cumulative_reward(true_ctrs, decisions, alg_names, save_path):
+    
     """Plot cumulative rewards over time."""
 
     rewards = [None] * len(decisions)  # Pre-allocate list
@@ -76,9 +73,6 @@ def plot_cumulative_reward(true_ctrs, decisions, alg_names, save_path):
     plt.title('Learning Progress: Cumulative Reward Over Time')
     plt.legend(loc='lower right')
     plt.grid(True, alpha=0.3)
-    
-    # Add log scale option
-    plt.xscale('log')
- 
+    plt.xscale('log') # log scale for x axis
     plt.savefig(Path(save_path) / 'cumulative_reward.png')
     plt.close()

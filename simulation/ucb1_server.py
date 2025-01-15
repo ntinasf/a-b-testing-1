@@ -10,13 +10,14 @@ banditA = UCB1Bandit("A")
 banditB = UCB1Bandit("B") 
 
 decisions = []
-# Compare samples and select button to show
+
 @app.route("/show")
 def show():
 
   decisions.append(0)
   n_views = banditA.views + banditB.views
 
+  # Compare samples and select button to show
   if banditA.sample(n_views) > banditB.sample(n_views): 
     button = "A"
     banditA.add_view()
@@ -48,7 +49,6 @@ def click_button():
 
 if __name__ == "__main__":
   app.run(host="127.0.0.1", port="8888")
-
   pd.Series(decisions).to_csv(f'data/{method}_decisions.csv', index=False)
 
   print(f"\n A : Clicks-{banditA.clicks}, Views-{banditA.views}, CTR-{banditA.clicks / banditA.views}")

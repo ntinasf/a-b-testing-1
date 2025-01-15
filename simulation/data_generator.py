@@ -10,8 +10,8 @@ import pandas as pd
 np.random.seed(42) # For reproducibility
 
 N_SAMPLES = 20000 # Total number of views for both buttons
-CTR_A = 0.07 # True CTR for button A (7%)
-CTR_B = 0.10 # True CTR for button B (10%)
+CTR_A = 0.07 # True CTR for button A
+CTR_B = 0.10 # True CTR for button B
 
 # Generate binary click data
 clicks_a = np.random.binomial(n=1, p=CTR_A, size=N_SAMPLES//2) 

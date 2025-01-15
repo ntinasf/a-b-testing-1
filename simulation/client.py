@@ -21,7 +21,7 @@ print("b.mean:", b.mean())
 i = 0
 j = 0
 count = 0
-while (i < len(a) and j < len(b)) and count <= 5000: # 2000, 5000, 9400
+while (i < len(a) and j < len(b)) and count <= 5000: # 5000, 9400
   # Get button recommendation from server
   r = requests.get("http://localhost:8888/show")
   r = r.json()

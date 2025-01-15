@@ -12,7 +12,7 @@ This project implements and compares different approaches to A/B testing, includ
 - **Hypothesis**: "A new button design will increase click-through rates compared to the existing design"
 - **Overall Evaluation Criterion (OEC)**: Click-through rate (CTR)
 - **Baseline**: 7% CTR (based on historical data)
-- **Minimum Detectable Effect**: 25% relative improvement (1.75 percentage points)
+- **Minimum Detectable Effect**: 25% relative improvement (1.75 percentage increase)
 
 ## Implementation
 
@@ -20,6 +20,7 @@ This project implements and compares different approaches to A/B testing, includ
 The project simulates user interactions where each visitor:
 - Is shown either button A (control) or button B (treatment)
 - Generates a binary outcome (1: click, 0: no click)
+- We set CTR of button A to be 0.07 (7%) and for button B 0.10 (10%)
 
 ### Testing Approaches
 1. **Classic A/B Test**
@@ -45,7 +46,7 @@ pip install -r requirements.txt
 ```
 
 ### Running Experiments
-All scripts are located in the `simulation` folder:
+All scripts are located in the [`simulation`](simulation) folder:
 
 1. **Generate Data**
 ```bash
@@ -92,7 +93,9 @@ python client.py  # Set count<=5000
 
 
 ## Results
-For detailed analysis and conclusions, see[`notebooks/analysis.ipynb`](notebooks/analysis.ipynb). Key findings:
+For detailed analysis and conclusions, see[`notebooks/analysis.ipynb`](analysis/analysis.ipynb).
+
+Key findings:
 
 - Classic A/B testing confirmed Button B's superiority with 95% confidence, requiring ~4,700 samples per variant
 - Thompson Sampling implementations both identified the better variant while providing:

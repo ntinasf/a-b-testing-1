@@ -11,7 +11,6 @@ class ThompsonBandit:
         self.minimum_exploration = minimum_exploration
 
     def sample(self):
-        # Beta distribution with a=1+successes, b=1+failures
         a = self.a_prior + self.clicks
         b = self.b_prior + self.views - self.clicks
         return np.random.beta(a=a, b=b)

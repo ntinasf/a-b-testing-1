@@ -17,17 +17,17 @@ banditB = ThompsonBandit("B", a_prior=1, b_prior=1, minimum_exploration=True) # 
 
 # Initialize the visualization tool
 visualizer = BanditVisualizer()
-snapshot_points = [50, 150, 500, 1500, 3000, 5000]
+snapshot_points = [50, 150, 500, 1500, 3000, 5000] # For posterior graphing
 decisions = []
 
-# Compare samples and select button to sho
 @app.route("/show")
 def show():
 
   decisions.append(0)
   n_views = banditA.views + banditB.views
-  minimum_explore = banditA.minimum_exploration and banditB.minimum_exploration
+  minimum_explore = banditA.minimum_exploration and banditB.minimum_exploration # Check if exploration is True for both bandits
   
+  # Compare samples and select button to show
   if minimum_explore and n_views < 600:
     sample_a = np.random.random()
     sample_b = np.random.random()
@@ -69,11 +69,8 @@ def click_button():
 
 if __name__ == "__main__":
   app.run(host="127.0.0.1", port="8888")
-
   visualizer.create_grid(method=method, save_path='data/figures')
-  
   pd.Series(decisions).to_csv(f'data/{method}_decisions.csv', index=False) 
-  
   results = analyze_and_save_results(banditA, banditB, original_df, method)
   pd.DataFrame(results).to_csv(f'data/{method}_results.csv', index=False)
 
